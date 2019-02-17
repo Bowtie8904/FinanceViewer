@@ -62,24 +62,7 @@ public class DataController implements InsertListener, DeleteListener, UpdateLis
         var builder = new JSONBuilder();
         var list = new JSONArray();
 
-        var filtered = this.transactions;
-
-        if (!filter.isEmpty())
-        {
-            filtered = this.transactions.stream().filter(t ->
-            {
-                return t.getSenderReceiver().toLowerCase().contains(filter.toLowerCase())
-                        || t.getType().toLowerCase().contains(filter.toLowerCase())
-                        || t.getUsage().toLowerCase().contains(filter.toLowerCase());
-            }).collect(Collectors.toList());
-        }
-
-        filtered = filtered.stream().filter(t ->
-        {
-            return t.getBookDateMillis() >= begin && t.getBookDateMillis() <= end;
-        }).collect(Collectors.toList());
-
-        for (var t : filtered)
+        for (var t : applyFilter(begin, end, filter))
         {
             list.put(t.toJSON());
         }
@@ -106,6 +89,21 @@ public class DataController implements InsertListener, DeleteListener, UpdateLis
         var rows = new ConsoleRowList(25, 40, 50, 50, 10, 14);
         rows.addTitle(true, "ID", "Type", "Usage", "Sender/Receiver", "Amount", "Bookdate");
 
+        for (var t : applyFilter(begin, end, filter))
+        {
+            rows.addRow(true, t.getFormattedData());
+        }
+
+        String formatted = rows.toString();
+        formatted = formatted.replace("\n", "<br>");
+        formatted = formatted.replace(" ", "&nbsp;");
+        formatted = "<font face=\"courier\">" + formatted + "</font>";
+
+        return formatted;
+    }
+
+    private List<Transaction> applyFilter(long begin, long end, String filter)
+    {
         var filtered = this.transactions;
 
         if (!filter.isEmpty())
@@ -123,17 +121,7 @@ public class DataController implements InsertListener, DeleteListener, UpdateLis
             return t.getBookDateMillis() >= begin && t.getBookDateMillis() <= end;
         }).collect(Collectors.toList());
 
-        for (var t : filtered)
-        {
-            rows.addRow(true, t.getFormattedData());
-        }
-
-        String formatted = rows.toString();
-        formatted = formatted.replace("\n", "<br>");
-        formatted = formatted.replace(" ", "&nbsp;");
-        formatted = "<font face=\"courier\">" + formatted + "</font>";
-
-        return formatted;
+        return filtered;
     }
 
     private boolean isAuthorized(String ip)
