@@ -16,6 +16,11 @@
 
 .classpath
 
+target/
+properties/
+transactions/
+logs/
+
 # Package Files #
 *.jar
 *.war
