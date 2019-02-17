@@ -16,6 +16,8 @@
 
 .classpath
 
+db/
+
 target/
 properties/
 transactions/
