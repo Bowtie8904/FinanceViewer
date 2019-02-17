@@ -1,13 +1,13 @@
 package core.db;
 
-import bowt.db.LocalDatabase;
+import bowt.db.RemoteDatabase;
 import bowt.db.constants.SqlType;
 
 /**
  * @author &#8904
  *
  */
-public class Database extends LocalDatabase
+public class Database extends RemoteDatabase
 {
     /**
      * @see bowt.db.DatabaseAccess#createTables()
