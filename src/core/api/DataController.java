@@ -45,7 +45,7 @@ public class DataController implements InsertListener, DeleteListener, UpdateLis
         this.transactions.sort(Comparator.comparing(Transaction::getBookDateMillis).reversed());
     }
 
-    @GetMapping("/finances")
+    @GetMapping("/finances/raw")
     @ResponseBody
     public String getData(@RequestParam(name = "beginDate", defaultValue = "0") String beginDate,
             @RequestParam(name = "endDate", defaultValue = "99999999999999999") String endDate,
