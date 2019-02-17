@@ -7,6 +7,7 @@ import bowt.db.DatabaseAccess;
 import bowt.db.store.SqlEntry;
 import bowt.prop.Properties;
 import bowt.thread.Threads;
+import core.api.DataController;
 
 /**
  * @author &#8904
@@ -17,6 +18,7 @@ public class TransactionReader
     private long readInterval;
     private File searchDir;
     private DatabaseAccess db;
+    public static DataController dataController;
 
     public TransactionReader(DatabaseAccess db)
     {
@@ -30,6 +32,7 @@ public class TransactionReader
         Threads.get().scheduleAtFixedRate(() ->
         {
             read();
+            dataController.loadTransactions();
         }, readInterval, readInterval, TimeUnit.MILLISECONDS);
     }
 

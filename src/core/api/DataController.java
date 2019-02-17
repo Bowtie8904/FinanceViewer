@@ -23,6 +23,7 @@ import bowt.db.store.SqlEntry;
 import bowt.json.JSONBuilder;
 import core.Main;
 import core.financ.Transaction;
+import core.financ.TransactionReader;
 
 /**
  * @author &#8904
@@ -32,17 +33,25 @@ import core.financ.Transaction;
 public class DataController implements InsertListener, DeleteListener, UpdateListener
 {
     private List<Transaction> transactions;
+    private boolean dataHasChanged;
 
     public DataController()
     {
         Main.db.registerListener(this);
+        TransactionReader.dataController = this;
+        this.dataHasChanged = true;
         loadTransactions();
     }
 
-    private void loadTransactions()
+    public void loadTransactions()
     {
-        this.transactions = SqlEntry.init(Main.db, Transaction.class);
-        this.transactions.sort(Comparator.comparing(Transaction::getBookDateMillis).reversed());
+        if (this.dataHasChanged)
+        {
+            this.transactions = SqlEntry.init(Main.db, Transaction.class);
+            this.transactions.sort(Comparator.comparing(Transaction::getBookDateMillis).reversed());
+
+            this.dataHasChanged = false;
+        }
     }
 
     @GetMapping("/finances/raw")
@@ -135,7 +144,7 @@ public class DataController implements InsertListener, DeleteListener, UpdateLis
     @Override
     public void onUpdate(UpdateEvent e)
     {
-        loadTransactions();
+        this.dataHasChanged = true;
     }
 
     /**
@@ -144,7 +153,7 @@ public class DataController implements InsertListener, DeleteListener, UpdateLis
     @Override
     public void onDelete(DeleteEvent e)
     {
-        loadTransactions();
+        this.dataHasChanged = true;
     }
 
     /**
@@ -153,6 +162,6 @@ public class DataController implements InsertListener, DeleteListener, UpdateLis
     @Override
     public void onInsert(InsertEvent e)
     {
-        loadTransactions();
+        this.dataHasChanged = true;
     }
 }
