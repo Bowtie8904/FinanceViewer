@@ -1,17 +1,18 @@
-package core.financ;
+package main.bt.back.obj;
 
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import org.json.JSONObject;
 
-import bowt.db.constants.SqlType;
-import bowt.db.store.anot.Column;
-import bowt.db.store.anot.Identity;
-import bowt.db.store.anot.Table;
-import bowt.id.LongID;
-import bowt.json.JSONBuilder;
-import bowt.json.Jsonable;
+import bt.db.constants.SqlType;
+import bt.db.store.anot.Column;
+import bt.db.store.anot.Identity;
+import bt.db.store.anot.Table;
+import bt.utils.id.LongID;
+import bt.utils.json.JSONBuilder;
+import bt.utils.json.Jsonable;
 
 /**
  * @author &#8904
@@ -20,6 +21,8 @@ import bowt.json.Jsonable;
 @Table("bankTransaction")
 public class Transaction implements Jsonable
 {
+    private static SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+
     @Identity
     @Column(name = "transactionID", type = SqlType.LONG)
     private long transactionID;
@@ -48,7 +51,7 @@ public class Transaction implements Jsonable
     }
 
     public Transaction(Calendar bookDate, double amount, String type, String senderReceiver, String usage,
-            String source)
+                       String source)
     {
         this.transactionID = LongID.uniqueID();
         this.bookDate = new Date(bookDate.getTimeInMillis());
@@ -89,11 +92,22 @@ public class Transaction implements Jsonable
         return this.amount;
     }
 
+    public String getFormattedAmount()
+    {
+        return String.format("%.2f",
+                             this.amount);
+    }
+
     public Calendar getBookDate()
     {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(this.bookDate.getTime());
         return cal;
+    }
+
+    public String getDateString()
+    {
+        return format.format(this.bookDate);
     }
 
     public long getBookDateMillis()
@@ -108,7 +122,8 @@ public class Transaction implements Jsonable
         data[1] = this.type;
         data[2] = this.usage;
         data[3] = this.senderReceiver;
-        data[4] = String.format("%.2f", this.amount);
+        data[4] = String.format("%.2f",
+                                this.amount);
         data[5] = this.bookDate.toString();
 
         return data;
@@ -121,13 +136,20 @@ public class Transaction implements Jsonable
     public JSONObject toJSON()
     {
         return new JSONBuilder()
-                .put("id", this.transactionID)
-                .put("type", this.type)
-                .put("usage", this.usage)
-                .put("senderReceiver", this.senderReceiver)
-                .put("amount", this.amount)
-                .put("bookDate", this.bookDate.toString())
-                .put("source", this.source)
-                .toJSON();
+                                .put("id",
+                                     this.transactionID)
+                                .put("type",
+                                     this.type)
+                                .put("usage",
+                                     this.usage)
+                                .put("senderReceiver",
+                                     this.senderReceiver)
+                                .put("amount",
+                                     this.amount)
+                                .put("bookDate",
+                                     this.bookDate.toString())
+                                .put("source",
+                                     this.source)
+                                .toJSON();
     }
 }
